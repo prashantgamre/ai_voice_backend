@@ -62,4 +62,6 @@ USER appuser
 # Run the application using UV
 # UV will activate the virtual environment and run the agent.
 # Start the LiveKit Agents worker using the entrypoint defined in src/agent.py
-CMD ["uv", "run", "python", "-m", "livekit.agents.cli", "run", "src.agent:entrypoint"]
+#CMD ["uv", "run", "python", "-m", "livekit.agents.cli", "run", "src.agent:entrypoint"]
+
+CMD ["uv", "run", "python", "src/agent.py", "start"]
