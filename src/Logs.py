@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import psutil, datetime
+import uvicorn
 
 app = FastAPI()
 
@@ -11,3 +12,7 @@ def get_metrics():
         "disk": psutil.disk_usage("/").percent,
         "timestamp": datetime.datetime.now().isoformat()
     }
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
