@@ -9,6 +9,29 @@ from Zoho_token import get_access_token
 
 
 @function_tool()
+async def products_details(
+    context: RunContext,
+    products:str
+    ):
+    """Get products details from database."""
+
+    try:
+        token = get_access_token()
+        headers = {
+    "Authorization": f"Zoho-oauthtoken {token}",
+    } # 1000.d9ee65f2bbb86efb9d96fefa55c41d9c.9ff07cd9dc39280ea5a4d5ddc5efde94
+        response = requests.get(f"https://www.zohoapis.in/crm/v8/Products?fields=Product_Name={products},Unit_Price,Product_Name,Color,Storage", headers=headers)
+        if response.status_code == 200:
+            logging.info(f"Products details for {products} retrieved : {response.json()}")
+            return response.json()
+        else:
+            logging.error(f"Error getting products details for {products}: {response.json()}")
+            return None
+    except Exception as e:
+        logging.error(f"Error getting products details: {e}")
+        return None
+
+@function_tool()
 async def user_details(
     context: RunContext,
     number:str

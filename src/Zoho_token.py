@@ -14,15 +14,17 @@ import requests
 import json
 
 # Config: Prefer environment variables; fallback to current hardcoded values (consider moving these to env vars)
-REFRESH_TOKEN = os.getenv("ZCRM_REFRESH_TOKEN", "1000.8b2b6a958ac61db0f6f4060e68f73510.98997cef5924d3138eb1c33ffb90bc4f")
-CLIENT_ID = os.getenv("ZCRM_CLIENT_ID", "1000.8560GQVGSJ3HYSQ0QJ1SZ38G1QAYMW")
-CLIENT_SECRET = os.getenv("ZCRM_CLIENT_SECRET", "7b00100eeb05eae0060d3f834e4a5e7bc69665d037")
+REFRESH_TOKEN = os.getenv("ZCRM_REFRESH_TOKEN", "1000.64736e2f23724d4b8a0443a2ccb640ff.8375d82c3b7ce9c4247d1ebb8b23ef98")
+CLIENT_ID = os.getenv("ZCRM_CLIENT_ID", "1000.6D6TQVEON9AP86IEIA5DUDETZ6PZPJ")
+CLIENT_SECRET = os.getenv("ZCRM_CLIENT_SECRET", "6e9db45c0ec9a3dac6f4404f5ed6e27b424d14a65c")
 TOKEN_BASE = os.getenv("ZCRM_ACCOUNTS_BASE", "https://accounts.zoho.in")
 API_BASE = os.getenv("ZCRM_API_BASE", "https://www.zohoapis.in")
 PHONE_TO_SEARCH = os.getenv("ZCRM_TEST_PHONE", "9833220705")
+PRODUCTS_TO_SEARCH = os.getenv("ZCRM_TEST_PRODUCTS", "Iphon17 pro")
 
 LEADS_SEARCH_URL = f"{API_BASE}/crm/v8/Leads/search?phone={PHONE_TO_SEARCH}"
 
+Products_url = f"{API_BASE}/crm/v8/Products?fields=Product_Name={PRODUCTS_TO_SEARCH},Unit_Price,Product_Name,Color,Storage"
 
 def get_access_token() -> str:
     """Get a fresh access token using the refresh token."""
@@ -48,6 +50,11 @@ def make_leads_request(access_token: str):
     }
     return requests.get(LEADS_SEARCH_URL, headers=headers, timeout=30)
 
+def make_products_request(access_token: str):
+    headers = {
+        "Authorization": f"Zoho-oauthtoken {access_token}",
+    }
+    return requests.get(Products_url, headers=headers, timeout=30)
 
 def is_auth_error(response: requests.Response) -> bool:
     """Detect if response indicates an expired/invalid token."""
@@ -78,6 +85,7 @@ def main():
 
     # First attempt
     resp = make_leads_request(token)
+    products_response = make_products_request(token)
 
     # If token invalid/expired, refresh once and retry
     if is_auth_error(resp):
@@ -88,6 +96,7 @@ def main():
             print("Original response:", resp.status_code, resp.text)
             return
         resp = make_leads_request(token)
+        products_response = make_products_request(token)
 
     # Handle final response
     if resp.status_code == 200:
@@ -108,6 +117,27 @@ def main():
         print("Error: failed to fetch data")
         print(resp.status_code)
         print(resp.text)
+
+
+    # Handle final Products response
+    if products_response.status_code == 200:
+        try:
+            data = products_response.json()
+        except Exception:
+            print("Success but response is not JSON:")
+            print(products_response.text)
+            return
+        # Print the data section if present, else full
+        if isinstance(data, dict) and "data" in data:
+            print(data["data"])
+        else:
+            print(data)
+        # Also print the access token used (for debugging). Remove in production.
+        print("Access token used:", token)
+    else:
+        print("Error: failed to fetch data")
+        print(products_response.status_code)
+        print(products_response.text)
 
 
 if __name__ == "__main__":

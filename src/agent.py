@@ -4,7 +4,7 @@ from livekit.agents import AgentSession, Agent, RoomInputOptions , function_tool
 from livekit.plugins import noise_cancellation
 from livekit.plugins import google
 from prompts import Aeoncredit_Assistant_instructions , Unicornstore_Assistant_instructions
-from tools import user_details,Record_details
+from tools import user_details,Record_details,products_details
 import os
 
 load_dotenv(".env.local")
@@ -15,7 +15,7 @@ api_key=os.getenv("Google_API_KEY")
 
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(instructions=Unicornstore_Assistant_instructions,tools=[user_details,Record_details])
+        super().__init__(instructions=Unicornstore_Assistant_instructions,tools=[products_details,user_details,Record_details])
 
 
 
