@@ -102,3 +102,67 @@ async def Record_details(
     except Exception as e:
         logging.error(f"Error getting user details: {e}")
         return None
+
+@function_tool()
+async def Solutions_details(
+    context: RunContext,
+    Solutions:str
+    ):
+    """Get Solutions details from database."""
+
+    try:
+        token = get_access_token()
+        headers = {
+    "Authorization": f"Zoho-oauthtoken {token}",
+    } # 1000.d9ee65f2bbb86efb9d96fefa55c41d9c.9ff07cd9dc39280ea5a4d5ddc5efde94
+        response = requests.get(f"https://www.zohoapis.in/crm/v8/Solutions?fields=Solution_Title,Question,Answer", headers=headers)
+        if response.status_code == 200:
+            logging.info(f"Solutions details for {Solutions} retrieved : {response.json()}")
+            return response.json()
+        else:
+            logging.error(f"Error getting Solutions details for {Solutions}: {response.json()}")
+            return None
+    except Exception as e:
+        logging.error(f"Error getting Solutions details: {e}")
+        return None
+
+@function_tool()
+async def Add_Issue_Cases(
+    context: RunContext,
+    Issue:str,
+    Owner_Id:60050148252,
+    Staus:"Escalated",
+    Email:str,
+    Phone:str,
+    Product:str,
+    Description:str,
+    ):
+    """Add Issue details in database."""
+
+    try:
+        token = get_access_token()
+        headers = {"Authorization": f"Zoho-oauthtoken {token}"}
+        data = {
+        "data": [
+            {
+            "Owner": {
+                "id": Owner_Id
+            },
+            "Status": Staus,
+            "Email": Email,
+            "Phone": Phone,
+            "Product": Product,
+            "Description": Description,
+        }
+    ]
+}
+        response = requests.post(f"https://www.zohoapis.in/crm/v8/Cases", headers=headers,data=json.dumps(data))
+        if response.status_code == 201:
+            logging.info(f"Issue details for {Issue} retrieved : {response.json()}")
+            return response.json()
+        else:
+            logging.error(f"Error getting Issue details for {Issue}: {response.json()}")
+            return None
+    except Exception as e:
+        logging.error(f"Error getting Issue details: {e}")
+        return None

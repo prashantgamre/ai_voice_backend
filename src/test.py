@@ -3,19 +3,16 @@ from livekit import agents
 from livekit.agents import AgentSession, Agent, RoomInputOptions , function_tool
 from livekit.plugins import noise_cancellation
 from livekit.plugins import google
-from prompts import Aeoncredit_Assistant_instructions , Unicornstore_Assistant_instructions
-from tools import user_details,Record_details,products_details,Solutions_details
+from Ai_techer_Prompt import AI_Teacher_Instructions
 import os
 
 load_dotenv(".env.local")
 
 api_key=os.getenv("Google_API_KEY")
 
-
-
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(instructions=Unicornstore_Assistant_instructions,tools=[products_details,user_details,Record_details,Solutions_details])
+        super().__init__(instructions=AI_Teacher_Instructions)
 
 
 
@@ -34,11 +31,8 @@ async def entrypoint(ctx: agents.JobContext):
     )
 
     await session.generate_reply(
-        instructions="Greet the user and tell i am Unicornstore AI Voice Assistant in Hindi and ask wchich language user want to chat with you."
+        instructions="Greet the user and tell i am AI Teacher and ask user about which subject user want to learn."
     )
-
 
 if __name__ == "__main__":
     agents.cli.run_app(agents.WorkerOptions(entrypoint_fnc=entrypoint))
-    
-
